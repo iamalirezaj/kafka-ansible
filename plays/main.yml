@@ -1,0 +1,7 @@
+---
+- name: Provision hetzner-kafka server
+  hosts: htz-kafka
+  roles:
+    - ansible
+    - docker
+    - kafka

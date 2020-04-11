@@ -1,0 +1,34 @@
+- name: create projects directory
+  file:
+    path: /projects/casty.kafka
+    state: directory
+    recurse: yes
+
+- name: Ensure kafka docker-compose.yml file is created
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "/projects/casty.kafka/docker-compose.yml"
+    mode: "0644"
+  become: yes
+
+- name: Tear down existing services
+  docker_compose:
+    project_src: "/projects/casty.kafka"
+    state: absent
+  become: yes
+    
+- name: Build and start services
+  docker_compose:
+    project_src: "/projects/casty.kafka"
+  register: create_services_output
+  become: yes
+
+- name: Debug create and start services
+  debug:
+    var: create_services_output
+
+- name: Check services up and running
+  assert:
+    that:
+      - "zookeeper.zookeeper.state.status == 'running'"
+      - "kafka.kafka.state.status == 'running'"
